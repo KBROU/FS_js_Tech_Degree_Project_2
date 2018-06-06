@@ -3,65 +3,114 @@
 //5_26_2018
 //Use jQuery
 
-//Create a function that shows first 10 students
-
- //$('.student-list').hide();
-
+//Set variables
+let numberOfPages;
+let searchList = [];
 const list = $('.student-list li');
 const perPage = 10;
-const pageCount = $(list).length / perPage;
-const page = 1; 
+const page = 1;
 
-//Create and append the pagination links
-for(var i = 0 ; i<pageCount; i++){
+//Create pageCount function to calculate 10 items per page
+function pageCount (index) {
+    numberOfPages = $(index).length / perPage;
+}
+//call pageCount 
+pageCount (list);
+
+//Create the pagination buttons and add active class to the first button
+function paginButton () {
+    for(var i = 0 ; i<numberOfPages; i++){
        $('.pagination').append('<li><a href="#">'+(i+1)+'</a></li> ');
      }
 
-$('.pagination li a').first().addClass("active");
+    $('.pagination li a').first().addClass("active");
+}
+//call paginButton function
+paginButton ();
 
 
-//Create the showPage function
-function showPage (index, pageNumber) {
-   // first hide all students on the page
-    list.hide();
-    // then loop through all students in our student list argument
-    list.each( function (index, value) {
+//Add functionality to the pagination links with a click event listener
+function paginFunction (arr) {
+    $('.pagination li a').click(function () {
+        $('.pagination li a').removeClass("active");
+        $(this).addClass("active");
+        showPage($(arr), parseInt($(this).text()))
+    });
+}
+//call paginFunction function
+paginFunction (list);
+
+//Create function that loops through all the students and displays 10 per page
+function showPage (arr, pageNumber) {
+    // Loop through all students in our student list argument
+    $(arr).each( function (index, value) {
     // if student should be on this page number    
     if(index >= perPage * (pageNumber-1) && index < perPage * pageNumber) {
         // show the student
         $(value).show();
+       } else {
+        $(value).hide();
         }  
     });
 }
 
 
-//Call function
-showPage( list, page);
-
- //Add functionality to the pagination links with an event listener
-$('.pagination li a').click(function () {
-    $('.pagination li a').removeClass("active");
-    $(this).addClass("active");
-    showPage(this, parseInt($(this).text()))
-});
+//Call showPage function
+showPage (list, page);
 
 
 //Extra Credit Search Function
 
-//Add Search Component
+//Add Search Component to webpage
 
 $('.student-search').append('<div><input type="text" id="searchInput"  placeholder="Search for students..."><button>Search</button></div>');
 
+//No search result function
 
-//The click and keyup method works together
+function noResult () {
+    $('.student-list').prepend('<div class ="noMessage"><span>No Results From Search</span></div>'); 
+    $('.noMessage').hide();
+}
+noResult ();
+
 //Add functionality to the search
-$('.student-search, #searchInput').on('click keyup', function () {
-    //console.log(event.target);
-      var inputValue = $("#searchInput").val().toLowerCase();
-        $(list).filter(function() {
-          $(this).toggle($(this).text().toLowerCase().indexOf(inputValue) > -1); 
+$('.student-search button, #searchInput').on('click keyup', function () {
+    //reset searchList and pagination buttons
+    searchList = [];
+    $('.pagination li a').hide();
+    //create variable for user input  
+    var inputValue = $("#searchInput").val().toLowerCase();
+        //Loop through the list display list items that match input and hide the rest
+        $(list).each( function (){
+            if($(this).text().includes(inputValue)) {
+                $(this).show();
+                if (searchList !== $(this).show()) {
+                    searchList.push($(this).show())
+                    }
+               } else {
+                $(this).hide();
+               }
         });
-    });   
+        //call variables 
+        pageCount (searchList);
+        showPage (searchList, page);
+        paginButton ();
+        paginFunction (searchList);
+        
+        //Display no result if search does not find a match
+        if (searchList.length === 0){
+             $('.noMessage').show();
+             console.log('no result');
+            } else {
+             $('.noMessage').hide(); 
+            }
+        
+});   
+
+
+
+
+
 
 
 
