@@ -100,7 +100,6 @@ $('.student-search button, #searchInput').on('click keyup', function () {
         //Display no result if search does not find a match
         if (searchList.length === 0){
              $('.noMessage').show();
-             console.log('no result');
             } else {
              $('.noMessage').hide(); 
             }
